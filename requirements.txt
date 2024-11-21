@@ -1,0 +1,6 @@
+openai
+fastapi
+pydantic
+uvicorn
+starlette
+firebase_admin
