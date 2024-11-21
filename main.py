@@ -144,14 +144,13 @@ async def getMessageFromTori(model: MessageModel) -> ToriResponseModel:
     try:
         previous_chat_list = await getPreviousChat(user_uid = model.user_uid, user_chat_date = model.user_chat_date, new_user_message = model.new_user_message) 
         logger.info(f'Fetch Successful from firebase')
-
     except Exception as e:
-        logger.error(f'Failed to fetch data from firebase console due to {e}')
+        logger.error(f'Failed to fetch data (userUID = {model.user_uid}, chat_date = {model.user_chat_date}) from firebase console due to {e}')
         raise HTTPException(
             status_code=status.HTTP_501_NOT_IMPLEMENTED,
             detail=f'Failed to fetch data from firebase console due to {e}'
         )
-    
+     
     max_try = 3
     current_try = 0
 
@@ -163,21 +162,19 @@ async def getMessageFromTori(model: MessageModel) -> ToriResponseModel:
                 temperature = 0.21,
                 messages=previous_chat_list,
             )
-
             response = completion.choices[0].message.content
-            logger.info(f'Response succesfully generated, response = {response}')
+            logger.info(f'Response succesfully generated, response = {response}, userUID = {model.user_uid}, chat_date = {model.user_chat_date}')
 
             return ToriResponseModel(tori_message=response)
 
         except Exception as e:
-            logger.error(f'The conversation has not been responsed intentionally due to {e}')
-
+            logger.error(f'The conversation of (userUID = {model.user_uid}, chat_date = {model.user_chat_date}) has not been responsed intentionally due to {e}')
             if current_try<max_try : 
                 current_try += 1
                 logger.info('Retrying...')
                 continue
             else:
-                logger.error(f'Terminal Error and returned Hard-Coded Message')
+                logger.error(f'Terminal Error and returned Hard-Coded Message, (userUID = {model.user_uid}, chat_date = {model.user_chat_date})')
                 return ToriResponseModel(tori_message='(토리가 잠깐 딴 생각을 했나봐요! 다시 한번 토리를 불러주세요 ㅜㅜ)')
 
 
