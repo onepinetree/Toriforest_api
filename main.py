@@ -149,7 +149,7 @@ async def getMessageFromTori(model: MessageModel) -> ToriResponseModel:
             completion = await asyncio.to_thread(
                 client.chat.completions.create,
                 model="ft:gpt-4o-2024-08-06:personal:toriforest002:ATRZ3Q78",
-                temperature = 0.21,
+                temperature = 0.75,
                 messages=previous_chat_list,
             )
             response = completion.choices[0].message.content
